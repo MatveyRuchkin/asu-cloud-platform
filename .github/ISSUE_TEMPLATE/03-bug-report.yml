@@ -1,0 +1,24 @@
+name: "Ошибка"
+description: "Сообщить о проблеме с понятными шагами для повторения"
+title: "[Bug] "
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Что должно было произойти?"
+    validations: {required: true}
+  - type: textarea
+    id: actual
+    attributes:
+      label: "Что произошло?"
+    validations: {required: true}
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: "Как повторить?"
+      placeholder: "1. Открой...\n2. Нажми...\n3. Что увидел..."
+    validations: {required: true}
+  - type: textarea
+    id: env
+    attributes:
+      label: "Устройство, браузер, версия"

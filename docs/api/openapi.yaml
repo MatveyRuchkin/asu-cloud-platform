@@ -1,0 +1,221 @@
+openapi: 3.0.3
+info:
+  title: Student Platform API (DRAFT)
+  version: 0.1.0
+  description: Черновик для согласования. Не изменять маршруты или поля без review.
+servers:
+  - url: http://localhost:8000/api/v1
+paths:
+  /health:
+    get:
+      summary: Проверка работы сервера
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: {type: string, example: ok}
+  /auth/register:
+    post:
+      summary: Регистрация
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RegisterRequest'}
+      responses:
+        '201':
+          description: Пользователь создан
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/User'}
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /auth/login:
+    post:
+      summary: Вход
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/LoginRequest'}
+      responses:
+        '200':
+          description: Токен доступа
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Token'}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /users/me:
+    get:
+      summary: Свой профиль
+      security: [{bearerAuth: []}]
+      responses:
+        '200':
+          description: Профиль
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/User'}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /universities:
+    get:
+      summary: Список университетов
+      responses:
+        '200':
+          description: Университеты
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/University'}
+  /ads:
+    get:
+      summary: Просмотр объявлений
+      parameters:
+        - {name: category_id, in: query, schema: {type: string, format: uuid}}
+        - {name: university_id, in: query, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: Список
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/Ad'}
+    post:
+      summary: Создать объявление
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AdCreate'}
+      responses:
+        '201':
+          description: Создано
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Ad'}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /forum/sections:
+    get:
+      summary: Разделы форума
+      responses:
+        '200':
+          description: Список разделов
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/ForumSection'}
+  /forum/topics:
+    get:
+      summary: Темы форума
+      parameters:
+        - {name: section_id, in: query, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: Темы
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/ForumTopic'}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+  responses:
+    BadRequest:
+      description: Ошибка запроса
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    Unauthorized:
+      description: Требуется вход
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: string}
+        message: {type: string}
+        details: {type: object, additionalProperties: true}
+    RegisterRequest:
+      type: object
+      required: [email, password, display_name, university_id]
+      properties:
+        email: {type: string, format: email}
+        password: {type: string, minLength: 8}
+        display_name: {type: string, minLength: 2}
+        university_id: {type: string, format: uuid}
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: {type: string, format: email}
+        password: {type: string}
+    Token:
+      type: object
+      required: [access_token, token_type]
+      properties:
+        access_token: {type: string}
+        token_type: {type: string, example: bearer}
+    User:
+      type: object
+      required: [id, display_name, university_id]
+      properties:
+        id: {type: string, format: uuid}
+        display_name: {type: string}
+        university_id: {type: string, format: uuid}
+        faculty: {type: string, nullable: true}
+        course: {type: integer, nullable: true, minimum: 1}
+    University:
+      type: object
+      required: [id, name]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
+    AdCreate:
+      type: object
+      required: [category_id, title, description]
+      properties:
+        category_id: {type: string, format: uuid}
+        title: {type: string, minLength: 3}
+        description: {type: string, minLength: 1}
+        price_rub: {type: integer, nullable: true, minimum: 0}
+        image_url: {type: string, format: uri, nullable: true}
+    Ad:
+      allOf:
+        - {$ref: '#/components/schemas/AdCreate'}
+        - type: object
+          required: [id, author_id, university_id, status]
+          properties:
+            id: {type: string, format: uuid}
+            author_id: {type: string, format: uuid}
+            university_id: {type: string, format: uuid}
+            status: {type: string, enum: [active, closed]}
+    ForumSection:
+      type: object
+      required: [id, name]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
+        description: {type: string, nullable: true}
+    ForumTopic:
+      type: object
+      required: [id, section_id, title, author_id]
+      properties:
+        id: {type: string, format: uuid}
+        section_id: {type: string, format: uuid}
+        title: {type: string}
+        author_id: {type: string, format: uuid}

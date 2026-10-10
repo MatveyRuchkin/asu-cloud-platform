@@ -1,0 +1,29 @@
+name: "Задача"
+description: "Небольшое задание с результатом и критериями готовности"
+title: "[Задача] "
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: "Что конкретно нужно сделать"
+      description: "Понятно опиши результат без сложных терминов"
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: "Что нужно сдать"
+      description: "Файлы, ссылка на PR, макет или документация"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "Как проверить готовность"
+      description: "Критерии, которые сможет проверить другой участник"
+    validations:
+      required: true
+  - type: textarea
+    id: coordination
+    attributes:
+      label: "С кем согласовать и от чего зависит"
