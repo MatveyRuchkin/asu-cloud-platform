@@ -27,6 +27,35 @@ footer{border-top:1px solid #30415a;margin-top:58px;padding-top:21px;display:fle
 var root="https://github.com/MatveyRuchkin/asu-cloud-platform", members=[],grid=document.getElementById('grid'),detail=document.getElementById('detail'),wrap=document.getElementById('detailWrap'),search=document.getElementById('search'),sel=document.getElementById('dept');
 function h(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function url(p){return p.issue_number?root+'/issues/'+p.issue_number:root+'/issues?q='+encodeURIComponent(p.code)}
+function member(slug){return members.find(function(p){return p.slug===slug})}
+function firstContact(p){
+ if(!p.lead_slug)return p.slug==="ruchkin"?"Сюда приходят лиды с общими организационными вопросами":"К тебе обращаются руководители технических направлений";
+ var lead=member(p.lead_slug);return lead?lead.name:"Уточнить в общей Issue";
+}
+function nextContact(p){
+ if(!p.lead_slug)return p.slug==="sergeenko"?"Матвей Ручкин — организационные приоритеты и сроки":"Решение на уровне управления проектом";
+ var lead=member(p.lead_slug);
+ if(lead&&lead.lead_slug){var senior=member(lead.lead_slug);return senior?senior.name:"Уточнить у руководителя проекта"}
+ return p.lead_slug==="ruchkin"?"Матвей Ручкин — организационные вопросы":"Михаил Сергеенко — технические вопросы; Матвей Ручкин — приоритеты через лида";
+}
+function contactPath(p){
+ var nodes=[p],seen=new Set([p.slug]),cur=p;
+ while(cur.lead_slug&&!seen.has(cur.lead_slug)){
+  cur=member(cur.lead_slug);if(!cur)break;seen.add(cur.slug);nodes.push(cur);
+ }
+ return nodes.map(function(x,i){return (i?'<span class="arrow">→</span>':'')+'<span class="node">'+h(x.name)+'</span>'}).join('');
+}
+function renderHierarchy(groups){
+ var target=document.getElementById('directionGroups');
+ target.innerHTML=groups.map(function(g){
+  var lead=member(g.lead_slug);if(!lead)return '';
+  return '<article class="direction"><h3>'+h(g.title)+'</h3><p class="scope">'+h(g.about)+'</p>'+
+   '<span class="small muted">Первый контакт / лид:</span><br><a class="contact" href="#person/'+h(lead.slug)+'">'+h(lead.name)+'</a>'+
+   '<div class="members"><span class="small muted">Участники:</span>'+
+   g.member_slugs.map(function(slug){var p=member(slug);return p?'<a href="#person/'+h(p.slug)+'">'+h(p.name)+'</a>':''}).join('')+
+   '</div></article>';
+ }).join('');
+}
 function draw(){
 var q=search.value.trim().toLowerCase(),d=sel.value,arr=members.filter(function(p){return (!d||p.department===d)&&(!q||(p.name+' '+p.role+' '+p.task).toLowerCase().includes(q))});
 document.getElementById('counter').textContent=arr.length+' из '+members.length;
@@ -40,7 +69,7 @@ detail.innerHTML='<a href="#team">← Назад к команде</a><div class
 wrap.style.display='block';wrap.scrollIntoView({block:'start',behavior:'smooth'});
 }
 fetch('./team.json').then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(function(data){
-members=data.members;var dept=Array.from(new Set(members.map(function(p){return p.department}))).sort();dept.forEach(function(x){var e=document.createElement('option');e.value=x;e.textContent=x;sel.appendChild(e)});draw();view();search.oninput=draw;sel.onchange=draw;window.addEventListener('hashchange',view);
+members=data.members;renderHierarchy(data.groups||[]);var dept=Array.from(new Set(members.map(function(p){return p.department}))).sort();dept.forEach(function(x){var e=document.createElement('option');e.value=x;e.textContent=x;sel.appendChild(e)});draw();view();search.oninput=draw;sel.onchange=draw;window.addEventListener('hashchange',view);
 }).catch(function(e){grid.innerHTML='<p>Ошибка загрузки team.json. Проверьте файлы на GitHub Pages.</p>';console.error(e)});
 })();
 </script></body></html>
