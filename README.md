@@ -13,6 +13,8 @@
 
 **[OpenCode: установка и работа без обязательной подписки](docs/OPENCODE.md)** — самостоятельное руководство для Windows/macOS/Linux, выбор модели и работа с задачей.
 
+**[Структура команды: лиды и к кому обращаться](docs/TEAM_STRUCTURE.md)** · [Схема на сайте](https://matveyruchkin.github.io/asu-cloud-platform/#hierarchy)
+
 ## Старт для участника
 1. Найдите себя на [сайте команды](https://matveyruchkin.github.io/asu-cloud-platform/).
 2. Откройте персональную Issue в [Issues](https://github.com/MatveyRuchkin/asu-cloud-platform/issues), прочитайте [CONTRIBUTING.md](CONTRIBUTING.md) и [AGENTS.md](AGENTS.md).
