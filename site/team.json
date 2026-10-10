@@ -24,7 +24,8 @@
       ],
       "depends": "Все участники команды; Сергеенко Михаил",
       "phase": "Согласование",
-      "issue_number": 4
+      "issue_number": 4,
+      "lead_slug": null
     },
     {
       "slug": "sergeenko",
@@ -47,7 +48,8 @@
       ],
       "depends": "Матвей Ручкин, Михаил Косачев, Лаврецкий Константин, Хапков Алексей, Владислав Коптелов",
       "phase": "Согласование",
-      "issue_number": 5
+      "issue_number": 5,
+      "lead_slug": null
     },
     {
       "slug": "lavretsky",
@@ -70,7 +72,8 @@
       ],
       "depends": "Михаил Косачев, Сергеенко Михаил, Адиля Юмина",
       "phase": "После согласования",
-      "issue_number": 6
+      "issue_number": 6,
+      "lead_slug": "sergeenko"
     },
     {
       "slug": "arina-minko",
@@ -93,7 +96,8 @@
       ],
       "depends": "Михаил Косачев, Владислав Коптелов, Сергеенко Михаил",
       "phase": "Согласование",
-      "issue_number": 7
+      "issue_number": 7,
+      "lead_slug": "lavretsky"
     },
     {
       "slug": "khapkov",
@@ -116,7 +120,8 @@
       ],
       "depends": "Сергеенко Михаил, Михаил Косачев, Михаил Никитин",
       "phase": "После согласования",
-      "issue_number": 8
+      "issue_number": 8,
+      "lead_slug": "sergeenko"
     },
     {
       "slug": "adilya",
@@ -139,7 +144,8 @@
       ],
       "depends": "Хапков Алексей, Лаврецкий Константин, Михаил Косачев, Михаил Никитин",
       "phase": "После согласования",
-      "issue_number": 9
+      "issue_number": 9,
+      "lead_slug": "khapkov"
     },
     {
       "slug": "dileev",
@@ -162,7 +168,8 @@
       ],
       "depends": "Хапков Алексей, Михаил Косачев, Лаврецкий Константин, Михаил Никитин",
       "phase": "После согласования",
-      "issue_number": 10
+      "issue_number": 10,
+      "lead_slug": "khapkov"
     },
     {
       "slug": "shaduntsev",
@@ -185,7 +192,8 @@
       ],
       "depends": "Хапков Алексей, Арина Минко, Михаил Косачев, Михаил Никитин",
       "phase": "После согласования",
-      "issue_number": 11
+      "issue_number": 11,
+      "lead_slug": "khapkov"
     },
     {
       "slug": "nikitin",
@@ -208,7 +216,8 @@
       ],
       "depends": "Матвей Ручкин, Хапков Алексей",
       "phase": "Можно начинать",
-      "issue_number": 12
+      "issue_number": 12,
+      "lead_slug": "khapkov"
     },
     {
       "slug": "kosachev",
@@ -231,7 +240,8 @@
       ],
       "depends": "Сергеенко Михаил, Лаврецкий Константин, Хапков Алексей, Владислав Коптелов, Найдёнов Юрий",
       "phase": "Согласование",
-      "issue_number": 13
+      "issue_number": 13,
+      "lead_slug": "sergeenko"
     },
     {
       "slug": "naydenov",
@@ -254,7 +264,8 @@
       ],
       "depends": "Михаил Косачев, Лаврецкий Константин, Сергеенко Михаил",
       "phase": "После согласования",
-      "issue_number": 14
+      "issue_number": 14,
+      "lead_slug": "sergeenko"
     },
     {
       "slug": "antonova",
@@ -277,7 +288,8 @@
       ],
       "depends": "Михаил Косачев, Лаврецкий Константин",
       "phase": "Можно начинать",
-      "issue_number": 15
+      "issue_number": 15,
+      "lead_slug": "naydenov"
     },
     {
       "slug": "golban",
@@ -300,7 +312,8 @@
       ],
       "depends": "Михаил Косачев, Дмитрий Дилеев, Лаврецкий Константин",
       "phase": "Можно начинать",
-      "issue_number": 16
+      "issue_number": 16,
+      "lead_slug": "naydenov"
     },
     {
       "slug": "aksyutin",
@@ -323,7 +336,8 @@
       ],
       "depends": "Михаил Косачев, Владислав Коптелов",
       "phase": "Можно начинать",
-      "issue_number": 17
+      "issue_number": 17,
+      "lead_slug": "kosachev"
     },
     {
       "slug": "koptelov",
@@ -346,14 +360,15 @@
       ],
       "depends": "Михаил Косачев, Лаврецкий Константин, Арина Минко",
       "phase": "Можно начинать",
-      "issue_number": 18
+      "issue_number": 18,
+      "lead_slug": "sergeenko"
     },
     {
       "slug": "skorlygin",
       "name": "Матвей Скорлыгин",
       "code": "DEMO-01",
       "department": "Контент и защита",
-      "role": "Контент и сценарий демонстрации",
+      "role": "Координатор контента, демонстрации и защиты",
       "mentor": "Матвей Ручкин",
       "task": "Подготовить сценарий демонстрации студенческой платформы",
       "deliverable": "docs/demo/demo-script.md",
@@ -369,7 +384,8 @@
       ],
       "depends": "Матвей Ручкин, Михаил Никитин",
       "phase": "Можно начинать",
-      "issue_number": 19
+      "issue_number": 19,
+      "lead_slug": "ruchkin"
     },
     {
       "slug": "pisarev",
@@ -377,7 +393,7 @@
       "code": "DOC-01",
       "department": "Контент и защита",
       "role": "Спикер: описание и выступление",
-      "mentor": "Матвей Ручкин",
+      "mentor": "Матвей Скорлыгин",
       "task": "Написать простое описание проекта и текст для защиты",
       "deliverable": "docs/presentation/project-description.md",
       "accept": [
@@ -392,7 +408,62 @@
       ],
       "depends": "Матвей Ручкин, Матвей Скорлыгин",
       "phase": "Можно начинать",
-      "issue_number": 20
+      "issue_number": 20,
+      "lead_slug": "skorlygin"
+    }
+  ],
+  "groups": [
+    {
+      "title": "Backend",
+      "lead_slug": "lavretsky",
+      "member_slugs": [
+        "arina-minko"
+      ],
+      "about": "Сервер, регистрация, объявления и форум"
+    },
+    {
+      "title": "Frontend и дизайн",
+      "lead_slug": "khapkov",
+      "member_slugs": [
+        "adilya",
+        "dileev",
+        "shaduntsev",
+        "nikitin"
+      ],
+      "about": "Страницы сайта, формы, дизайн и адаптивность"
+    },
+    {
+      "title": "API и демо-данные",
+      "lead_slug": "kosachev",
+      "member_slugs": [
+        "aksyutin"
+      ],
+      "about": "Единые JSON-поля, API, требования и тестовые данные"
+    },
+    {
+      "title": "Тестирование",
+      "lead_slug": "naydenov",
+      "member_slugs": [
+        "antonova",
+        "golban"
+      ],
+      "about": "Проверки, тест-кейсы, баги и качество"
+    },
+    {
+      "title": "База данных",
+      "lead_slug": "sergeenko",
+      "member_slugs": [
+        "koptelov"
+      ],
+      "about": "Таблицы и связи; здесь Владислав работает с техлидом напрямую"
+    },
+    {
+      "title": "Контент и защита",
+      "lead_slug": "skorlygin",
+      "member_slugs": [
+        "pisarev"
+      ],
+      "about": "Демонстрация, тексты и подготовка выступления"
     }
   ]
 }
