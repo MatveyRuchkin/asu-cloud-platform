@@ -5,7 +5,7 @@
 
 1. Найдите себя на сайте и откройте ссылку на свою Issue. Если роли назначены неверно — сообщите PM.
 2. Прочитайте README.md, AGENTS.md, docs/architecture.md и docs/api/openapi.yaml. Общий контракт пока является черновиком.
-3. Напишите в Issue **«беру»**, если она свободна; бот назначит её вам, если у вас есть права на назначение. Пока одна задача на человека.
+3. **Закрепите свою задачу за собой:** на персональной странице нажмите **«Открыть Issue #…»**, войдите в GitHub, прокрутите задачу вниз к полю **Add a comment**, введите `беру` и нажмите **Comment**. Бот [Issue Claim Bot](https://github.com/MatveyRuchkin/asu-cloud-platform/blob/main/.github/workflows/claim.yml) попытается назначить вас исполнителем (**Assignees**) и поставить метку **`status: taken`**. Проверьте, что ваше имя появилось в Assignees. Если бот отвечает, что назначение невозможно, обратитесь к PM: вероятно, вас нужно пригласить в репозиторий. **Не забирайте чужие персональные задачи.** Пока одна задача на человека.
 4. Сделайте Fork репозитория на свой GitHub-аккаунт. `git clone https://github.com/ВАШ_ЛОГИН/asu-cloud-platform.git`.
 5. `cd asu-cloud-platform && git remote add upstream https://github.com/MatveyRuchkin/asu-cloud-platform.git`.
 6. `git fetch upstream dev && git switch -c feature/НОМЕР upstream/dev` — так вы гарантированно начинаете с актуальной ветки `dev`.
