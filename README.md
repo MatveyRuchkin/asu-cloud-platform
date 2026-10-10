@@ -7,6 +7,12 @@
 ## Что мы разрабатываем
 Профили студентов, доску объявлений, форум. Учебные материалы, переписка и поиск остаются в общем видении продукта, но не обязательно входят в первый выпуск. [Подробнее](docs/requirements.md).
 
+## Новичку
+
+**[Пошаговая инструкция с нуля](docs/START_HERE.md)** — от регистрации до отправки Pull Request.
+
+**[OpenCode: установка и работа без обязательной подписки](docs/OPENCODE.md)** — самостоятельное руководство для Windows/macOS/Linux, выбор модели и работа с задачей.
+
 ## Старт для участника
 1. Найдите себя на [сайте команды](https://matveyruchkin.github.io/asu-cloud-platform/).
 2. Откройте персональную Issue в [Issues](https://github.com/MatveyRuchkin/asu-cloud-platform/issues), прочитайте [CONTRIBUTING.md](CONTRIBUTING.md) и [AGENTS.md](AGENTS.md).
