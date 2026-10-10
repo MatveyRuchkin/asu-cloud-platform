@@ -1,0 +1,38 @@
+name: Repository checks
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+permissions:
+  contents: read
+jobs:
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate team portal data and 17 assignments
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path(".")
+          d=json.loads((root/"site/team.json").read_text(encoding="utf-8"))
+          people=d["members"]
+          assert len(people)==17, len(people)
+          assert len({p["slug"] for p in people})==17
+          assert len({p["code"] for p in people})==17
+          for p in people:
+              for k in ["name","role","department","task","deliverable","mentor","depends"]:
+                  assert isinstance(p.get(k),str) and p[k].strip(), (p.get("name"),k)
+              assert len(p.get("steps",[]))>=2
+              assert len(p.get("accept",[]))>=2
+              assert (root/"docs/tasks"/(p["code"]+".md")).is_file(), p["code"]
+          assert (root/"site/index.html").is_file()
+          assert (root/"docs/api/openapi.yaml").is_file()
+          print("OK:",len(people),"participants")
+          PY
