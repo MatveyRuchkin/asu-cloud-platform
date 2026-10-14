@@ -23,7 +23,7 @@ jobs:
           root=Path(".")
           d=json.loads((root/"site/team.json").read_text(encoding="utf-8"))
           people=d["members"]
-          assert len(people)==17, len(people)
+          assert len(people)==18, len(people)
           assert len({p["slug"] for p in people})==17
           assert len({p["code"] for p in people})==17
           for p in people:
@@ -33,7 +33,7 @@ jobs:
               assert len(p.get("accept",[]))>=2
               assert (root/"docs/tasks"/(p["code"]+".md")).is_file(), p["code"]
           by_slug={p["slug"]:p for p in people}
-          assert set(by_slug)==set(["ruchkin","sergeenko","lavretsky","arina-minko","khapkov","adilya","dileev","shaduntsev","nikitin","kosachev","naydenov","antonova","golban","aksyutin","koptelov","skorlygin","pisarev"])
+          assert set(by_slug)==set(["ruchkin","sergeenko","lavretsky","arina-minko","khapkov","adilya","dileev","shaduntsev","nikitin","kosachev","naydenov","antonova","golban","aksyutin","koptelov","skorlygin","pisarev","arakcheev"])
           for p in people:
               seen={p["slug"]}
               current=p
@@ -44,11 +44,11 @@ jobs:
                   current=by_slug[next_slug]
               assert current["slug"] in {"ruchkin","sergeenko"}
           groups=d["groups"]
-          assert len(groups)==6
+          assert len(groups)==5
           for group in groups:
               assert group["lead_slug"] in by_slug
               assert all(x in by_slug for x in group["member_slugs"])
-          assert len(set(x for g in groups for x in g["member_slugs"]))==10
+          assert len(set(x for g in groups for x in g["member_slugs"]))==13
           assert (root/"site/index.html").is_file()
           assert (root/"docs/api/openapi.yaml").is_file()
           print("OK:",len(people),"participants")
