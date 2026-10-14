@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate team portal data and 17 assignments
+      - name: Validate 18 team members and role hierarchy
         shell: bash
         run: |
           python - <<'PY'
@@ -44,11 +44,14 @@ jobs:
                   current=by_slug[next_slug]
               assert current["slug"] in {"ruchkin","sergeenko"}
           groups=d["groups"]
-          assert len(groups)==5
+          assert len(groups)==6
           for group in groups:
               assert group["lead_slug"] in by_slug
               assert all(x in by_slug for x in group["member_slugs"])
-          assert len(set(x for g in groups for x in g["member_slugs"]))==13
+          assert len(set(x for g in groups for x in g["member_slugs"]))==12
+          assert any(g["lead_slug"]=="naydenov" and set(g["member_slugs"])=={"antonova","golban"} for g in groups)
+          assert all(by_slug[s]["lead_slug"]=="naydenov" for s in ["antonova","golban"])
+          assert by_slug["naydenov"]["lead_slug"]=="sergeenko"
           assert (root/"site/index.html").is_file()
           assert (root/"docs/api/openapi.yaml").is_file()
           print("OK:",len(people),"participants")
