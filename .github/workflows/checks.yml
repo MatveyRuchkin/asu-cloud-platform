@@ -24,8 +24,8 @@ jobs:
           d=json.loads((root/"site/team.json").read_text(encoding="utf-8"))
           people=d["members"]
           assert len(people)==18, len(people)
-          assert len({p["slug"] for p in people})==17
-          assert len({p["code"] for p in people})==17
+          assert len({p["slug"] for p in people})==18
+          assert len({p["code"] for p in people})==18
           for p in people:
               for k in ["name","role","department","task","deliverable","mentor","depends"]:
                   assert isinstance(p.get(k),str) and p[k].strip(), (p.get("name"),k)
