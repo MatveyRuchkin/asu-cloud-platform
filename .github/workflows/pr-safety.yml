@@ -1,0 +1,53 @@
+name: PR safety
+on:
+  pull_request:
+    branches: [dev, main]
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR target and accidentally committed secrets
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const repoName = context.repo.owner + '/' + context.repo.repo;
+            const problems = [];
+            if (pr.base.ref === 'main') {
+              if (pr.head.ref !== 'dev' || pr.head.repo.full_name !== repoName) {
+                problems.push('В main разрешены PR только из dev этого же репозитория.');
+              }
+            } else if (pr.base.ref !== 'dev') {
+              problems.push('Изменения участников направляйте в dev.');
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              ...context.repo, pull_number: pr.number, per_page: 100
+            });
+            for (const file of files) {
+              if (file.status === 'removed') continue;
+              const name = file.filename.split('/').pop();
+              const env = /^\.env(?:\..+)?$/i.test(name) && !/\.(example|sample|template)$/i.test(name);
+              const secretFile = /^id_(rsa|dsa|ecdsa|ed25519)$/i.test(name)
+                || /^credentials\.json$/i.test(name)
+                || /\.(key|pem|p12|pfx)$/i.test(name);
+              if (env || secretFile) {
+                problems.push('Нельзя публиковать секретные файлы: ' + file.filename);
+              }
+              // Scan added lines only; this is a basic guard, not full secret scanning.
+              const added = (file.patch || '').split('\n')
+                .filter(line => line.startsWith('+') && !line.startsWith('+++'))
+                .map(line => line.slice(1)).join('\n');
+              if (/-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----|\bgh[pousr]_[A-Za-z0-9]{30,}\b|\bgithub_pat_[A-Za-z0-9_]{40,}\b|\bAKIA[0-9A-Z]{16}\b/.test(added)) {
+                problems.push('В добавленных строках ' + file.filename + ' похожий на секрет фрагмент. Удалите его и перевыпустите ключ, если он настоящий.');
+              }
+            }
+            if (problems.length) {
+              core.setFailed(problems.join('\n'));
+            } else {
+              core.info('OK: безопасное направление PR; запрещённых файлов и явных секретов в diff не найдено.');
+            }
