@@ -1,0 +1,16 @@
+# Sensitive files are reviewed by project maintainers.
+# NOTE: CODEOWNERS becomes an enforced approval rule only after enabling
+# "Require review from Code Owners" in GitHub branch rules for main/dev.
+# GitHub usernames here have confirmed write access to this repository.
+
+/.github/ @MatveyRuchkin @PurpleSwtr
+/AGENTS.md @MatveyRuchkin @PurpleSwtr
+/docs/architecture.md @PurpleSwtr @MatveyRuchkin
+/docs/api/ @PurpleSwtr @MatveyRuchkin
+/backend/ @PurpleSwtr @MatveyRuchkin
+/database/ @PurpleSwtr @MatveyRuchkin
+/db/ @PurpleSwtr @MatveyRuchkin
+/migrations/ @PurpleSwtr @MatveyRuchkin
+/compose.yaml @PurpleSwtr @MatveyRuchkin
+/Dockerfile @PurpleSwtr @MatveyRuchkin
+/site/team.json @MatveyRuchkin @PurpleSwtr
