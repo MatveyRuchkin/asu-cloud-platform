@@ -14,7 +14,7 @@ jobs:
         with:
           script: |
             const pr=context.payload.pull_request;
-            const release=pr.base.ref==='main'&&pr.head.ref==='dev';
+            const release=pr.base.ref==='main'&&pr.head.ref==='dev'&&pr.head.repo.full_name===context.repo.owner+'/'+context.repo.repo;
             if(pr.base.ref!=='dev' && !release) core.setFailed('PR должен идти в dev, а релиз — из dev в main.');
             if(release) return;
             const m=(pr.body||'').match(/(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/i);
