@@ -228,17 +228,18 @@ export class Handler {
             "SELECT slug FROM users WHERE status='approved'",
           );
         const blockers = await this.store.all<Blocker>(
-          "SELECT * FROM blockers WHERE state NOT IN ('done','cancelled') ORDER BY created LIMIT 20",
+          `SELECT b.* FROM blockers b JOIN users u ON b.author=u.telegram_id
+           WHERE b.state NOT IN ('done','cancelled') AND u.slug IN (${scope.map(() => '?').join(',')})
+           ORDER BY b.created LIMIT 20`,
+          ...scope,
         );
         const rows = [];
         for (const b of blockers) {
-          const author = await this.store.user(b.author);
-          if (author?.slug && scope.includes(author.slug))
-            rows.push(
-              `#${b.id}, Issue #${b.issue}: ${states[b.state]}, этап ${b.stage}. ` +
-                (b.consent ? b.summary : 'Описание не разрешено к передаче.') +
-                (b.critical || b.stage >= 3 ? ' Требует решения руководителя.' : ''),
-            );
+          rows.push(
+            `#${b.id}, Issue #${b.issue}: ${states[b.state]}, этап ${b.stage}. ` +
+              (b.consent ? b.summary : 'Описание не разрешено к передаче.') +
+              (b.critical || b.stage >= 3 ? ' Требует решения руководителя.' : ''),
+          );
         }
         await reply(
           `Отчёт ${new Date().toISOString()} (UTC). Зарегистрировано ${people.filter((p) => scope.includes(p.slug)).length} из ${scope.length} в вашей области.\nGitHub сводки придут отдельными сообщениями по участникам: каждый запрос укладывается в Free-план.\nОткрытые блокеры (до 20 карточек):\n${rows.join('\n') || 'Нет в показанной выборке.'}`,
@@ -252,18 +253,15 @@ export class Handler {
         return;
       }
       if (command === '/blockers') {
-        const rows = await this.store.all<Blocker>(
-          "SELECT * FROM blockers WHERE author=? AND state NOT IN ('done','cancelled') ORDER BY created LIMIT 20",
+        const rows = await this.store.all<Blocker & { delivery: string | null }>(
+          `SELECT b.*,(SELECT group_concat(status,', ') FROM notifications n WHERE n.blocker=b.id) AS delivery
+           FROM blockers b WHERE author=? AND state NOT IN ('done','cancelled') ORDER BY created LIMIT 20`,
           uid,
         );
         if (!rows.length) await reply('Открытых блокеров нет.');
         for (const b of rows) {
-          const notices = await this.store.all<{ status: string }>(
-            'SELECT status FROM notifications WHERE blocker=?',
-            b.id,
-          );
           await reply(
-            `Блокер #${b.id}: ${states[b.state]}. Ответственный: ${team.member(b.target).name}\n${b.summary}\nДоставка: ${notices.map((n) => n.status).join(', ') || 'отправка не подтверждена'}`,
+            `Блокер #${b.id}: ${states[b.state]}. Ответственный: ${team.member(b.target).name}\n${b.summary}\nДоставка: ${b.delivery || 'отправка не подтверждена'}`,
             this.blockerButtons(b.id),
           );
         }

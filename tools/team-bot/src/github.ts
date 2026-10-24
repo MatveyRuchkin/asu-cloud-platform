@@ -62,6 +62,9 @@ export class GitHub {
   root: string;
   web: string;
   calls = 0;
+  private ready?: Promise<void>;
+  private cache = new Map<string, { value: string; expires: number }>();
+  private retryAt = 0;
   constructor(
     private env: Env,
     private store: Store,
@@ -77,17 +80,22 @@ export class GitHub {
   }
   async get<T>(path: string, params: Record<string, string> = {}): Promise<T> {
     const url = this.root + path + '?' + new URLSearchParams(params);
-    const cached = await this.store.first<{ value: string }>(
-      'SELECT value FROM github_cache WHERE key=? AND expires>?',
-      url,
-      now(),
-    );
-    if (cached) return JSON.parse(cached.value) as T;
-    const rate = await this.store.first<{ value: string }>(
-      "SELECT value FROM settings WHERE key='github_retry_at'",
-    );
-    if (rate && Number(rate.value) > now())
-      throw new RetryError(Math.min(3600, Number(rate.value) - now()));
+    // One bounded cache read per invocation avoids D1's 50-query Free ceiling.
+    this.ready ??= (async () => {
+      const rows = await this.store.all<{ key: string; value: string; expires: number }>(
+        'SELECT key,value,expires FROM github_cache WHERE expires>? ORDER BY expires DESC LIMIT 24',
+        now(),
+      );
+      for (const row of rows) this.cache.set(row.key, row);
+      const rate = await this.store.first<{ value: string }>(
+        "SELECT value FROM settings WHERE key='github_retry_at'",
+      );
+      this.retryAt = Number(rate?.value || 0);
+    })();
+    await this.ready;
+    const cached = this.cache.get(url);
+    if (cached && cached.expires > now()) return JSON.parse(cached.value) as T;
+    if (this.retryAt > now()) throw new RetryError(Math.min(3600, this.retryAt - now()));
     if (++this.calls > 32)
       throw new UserError('Слишком большой запрос GitHub для Free-плана. Уточните вопрос.');
     let response: Response;
@@ -112,6 +120,7 @@ export class GitHub {
         (Number(response.headers.get('x-ratelimit-reset')) || 0) - now(),
       );
       await response.body?.cancel();
+      this.retryAt = now() + delay;
       await this.store.run(
         "INSERT INTO settings VALUES('github_retry_at',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
         String(now() + delay),
@@ -125,7 +134,7 @@ export class GitHub {
     if (!response.ok) {
       await response.body?.cancel();
       throw new UserError(
-        'GitHub не предоставил данные. Состояние задачи неизвестно. Проверьте доступ или повторите позже.',
+        `GitHub не предоставил данные (HTTP ${response.status}). Состояние задачи неизвестно. Проверьте токен и доступ к репозиторию или повторите позже.`,
       );
     }
     const raw = await response.text();
@@ -135,13 +144,15 @@ export class GitHub {
     } catch {
       throw new RetryError();
     }
-    if (raw.length < 200000)
+    if (raw.length < 60000) {
       await this.store.run(
         'INSERT INTO github_cache VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,expires=excluded.expires',
         url,
         raw,
         now() + int(this.env.GITHUB_CACHE_TTL, 90, 300),
       );
+      this.cache.set(url, { value: raw, expires: now() + int(this.env.GITHUB_CACHE_TTL, 90, 300) });
+    }
     return data;
   }
   async pages<T>(path: string, params: Record<string, string> = {}, field?: string): Promise<T[]> {

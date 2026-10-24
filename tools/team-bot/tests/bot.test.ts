@@ -339,6 +339,26 @@ describe('registration and authorization', () => {
 });
 
 describe('GitHub and AI', () => {
+  it('keeps a cold-cache two-PR question below the D1 Free query budget', async () => {
+    await users();
+    const base = apiMock();
+    const fetcher = (async (input, init) => {
+      const path = new URL(String(input)).pathname;
+      if (path.endsWith('/pulls')) return Response.json([pr(), pr(72, 'Closes #17')]);
+      if (path.endsWith('/pulls/72'))
+        return Response.json({ ...pr(72, 'Closes #17'), head: { sha: 'def' } });
+      return base(input, init);
+    }) as Fetcher;
+    const count = vi.spyOn(store, 'stmt');
+    try {
+      await new Handler(env, store, fetcher).handle(msg(91, '/ask Жду Backend, как продолжать?'));
+      expect(env.AI!.run).toHaveBeenCalledTimes(1);
+      // Leave at least 10 statements for the inbox/lease/outbox queue orchestration.
+      expect(count.mock.calls.length).toBeLessThanOrEqual(40);
+    } finally {
+      count.mockRestore();
+    }
+  });
   it('finds own Issue, PR #17 references, failures and review comments', async () => {
     await users();
     const fetcher = apiMock(),
