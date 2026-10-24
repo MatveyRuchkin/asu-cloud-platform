@@ -22,10 +22,18 @@
 
 ## Документы
 - [Основные функции и этапы](docs/requirements.md)
-- [Архитектура и договорённости](docs/architecture.md) — черновик
+- [Архитектура: решения, структура папок, локальный запуск](docs/architecture/) — принято техлидом
+- [Архитектура и договорённости](docs/architecture.md) — черновик, на который опирались решения
 - [OpenAPI-контракт](docs/api/openapi.yaml) — черновик, требует согласования
 - [Задания всех 18 участников](docs/tasks/README.md)
 - [Порядок настройки GitHub Pages](docs/site-deploy.md)
+
+## Каркас проекта
+
+- [backend/](backend/) — API на FastAPI: запуск, проверки, владельцы модулей
+- [frontend/](frontend/) — приложение на Vue 3 + TypeScript: запуск, проверки, владельцы каталогов
+
+Локальный запуск — по инструкции в [docs/architecture/structure.md](docs/architecture/structure.md).
 
 ## Ветки
 `main` — стабильная версия; `dev` — рабочая версия; `feature/123` — изменения одной Issue.
