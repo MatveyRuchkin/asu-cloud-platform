@@ -22,7 +22,7 @@ export class Telegram {
     // Callback acknowledgement is best effort. All meaningful results use durable outbox.
     try {
       await this.fetcher(
-        `https://api.telegram.org/bot${this.env.TELEGRAM_BOT_TOKEN}/answerCallbackQuery`,
+        `https://api.telegram.org/bot${this.env.TELEGRAM_BOT_TOKEN.trim()}/answerCallbackQuery`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -70,7 +70,7 @@ export class Telegram {
     let response: Response;
     try {
       response = await this.fetcher(
-        `https://api.telegram.org/bot${this.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+        `https://api.telegram.org/bot${this.env.TELEGRAM_BOT_TOKEN.trim()}/sendMessage`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

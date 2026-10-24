@@ -7,6 +7,7 @@ import { Telegram, flush } from './telegram';
 import { Blocker, Env, Fetcher, RetryError, TelegramUpdate, UserError, int, now } from './types';
 
 export async function secretMatches(actual: string | null, expected: string | undefined) {
+  expected = expected?.trim();
   if (!actual || !expected || actual.length > 256) return false;
   const [a, b] = await Promise.all(
     [actual, expected].map((s) => crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))),
@@ -256,21 +257,74 @@ export default {
       if (
         !(await secretMatches(
           request.headers.get('Authorization'),
-          env.DIAGNOSTIC_SECRET ? `Bearer ${env.DIAGNOSTIC_SECRET}` : undefined,
+          env.DIAGNOSTIC_SECRET?.trim() ? `Bearer ${env.DIAGNOSTIC_SECRET.trim()}` : undefined,
         ))
       )
         return new Response('Forbidden', { status: 403 });
       const store = new Store(env.DB);
       if (url.pathname === '/diagnostics/telegram') {
         try {
-          const body = (await request.json()) as { send?: boolean };
-          const me = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/getMe`, {
+          const body = (await request.json()) as { send?: boolean; repair_webhook?: boolean };
+          const token = (env.TELEGRAM_BOT_TOKEN || '').trim();
+          const me = await fetch(`https://api.telegram.org/bot${token}/getMe`, {
             signal: AbortSignal.timeout(12000),
           });
-          const result = (await me.json()) as { ok: boolean };
+          const result = (await me.json()) as { ok: boolean; result?: { username: string } };
           if (!me.ok || !result.ok)
-            return Response.json({ getMe: false, sendMessage: false }, { status: 502 });
-          if (!body.send) return Response.json({ getMe: true, sendMessage: 'not-tested' });
+            return Response.json(
+              {
+                getMe: false,
+                telegram_http_status: me.status,
+                token_format_valid: /^\d+:[A-Za-z0-9_-]{30,}$/.test(token),
+                token_had_surrounding_whitespace: token !== env.TELEGRAM_BOT_TOKEN,
+                sendMessage: false,
+              },
+              { status: 502 },
+            );
+          if (body.repair_webhook) {
+            if (!env.TELEGRAM_WEBHOOK_SECRET?.trim())
+              return Response.json(
+                { getMe: true, error: 'webhook-secret-missing' },
+                { status: 503 },
+              );
+            const registered = await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
+              method: 'POST',
+              signal: AbortSignal.timeout(12000),
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                url: new URL('/webhook', request.url).href,
+                secret_token: env.TELEGRAM_WEBHOOK_SECRET.trim(),
+                allowed_updates: ['message', 'callback_query'],
+                drop_pending_updates: false,
+                max_connections: 2,
+              }),
+            });
+            const registration = (await registered.json()) as { ok: boolean };
+            if (!registered.ok || !registration.ok)
+              return Response.json(
+                { getMe: true, webhook_repaired: false, telegram_http_status: registered.status },
+                { status: 502 },
+              );
+          }
+          if (!body.send) {
+            const webhook = await fetch(`https://api.telegram.org/bot${token}/getWebhookInfo`, {
+              signal: AbortSignal.timeout(12000),
+            });
+            const info = (await webhook.json()) as {
+              ok: boolean;
+              result?: { url: string; pending_update_count: number; last_error_date?: number };
+            };
+            return Response.json({
+              getMe: true,
+              bot_username: result.result?.username,
+              token_had_surrounding_whitespace: token !== env.TELEGRAM_BOT_TOKEN,
+              webhook_url: info.result?.url,
+              pending_updates: info.result?.pending_update_count,
+              webhook_has_error: !!info.result?.last_error_date,
+              webhook_repaired: !!body.repair_webhook,
+              sendMessage: 'not-tested',
+            });
+          }
           const uid = Number((env.ADMIN_TELEGRAM_IDS || '').split(',')[0]),
             user = await store.user(uid);
           if (user?.status !== 'approved' || !user.notify)

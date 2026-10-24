@@ -58,6 +58,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\configure-secrets.ps1 -Worker
 
 Ввод токена скрыт. Скрипт добавляет четыре Cloudflare Secrets, проверяет `getMe` из Worker и выполняет `setWebhook` с проверочным секретом. Ожидающие обновления сохраняются (`drop_pending_updates=false`). Не запускайте polling того же токена.
 
+PowerShell передаёт значения через `scripts/put-secret.mjs`: он удаляет завершающий CRLF/BOM и не выводит ключ. Если использовалась ранняя версия установщика и бот молчит, обновите код и проверьте getMe/webhook: сам факт наличия Secret не означает успешной регистрации webhook. Защищённая диагностика `/diagnostics/telegram` поддерживает `repair_webhook: true` для восстановления с сохранением ожидающих сообщений.
+
 Ручной способ:
 
 ```powershell

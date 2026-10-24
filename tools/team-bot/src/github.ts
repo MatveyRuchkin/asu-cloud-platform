@@ -105,7 +105,9 @@ export class GitHub {
           Accept: 'application/vnd.github+json',
           'User-Agent': 'ASU-Team-Bot',
           'X-GitHub-Api-Version': '2022-11-28',
-          ...(this.env.GITHUB_TOKEN ? { Authorization: `Bearer ${this.env.GITHUB_TOKEN}` } : {}),
+          ...(this.env.GITHUB_TOKEN?.trim()
+            ? { Authorization: `Bearer ${this.env.GITHUB_TOKEN.trim()}` }
+            : {}),
         },
         signal: AbortSignal.timeout(12000),
         redirect: 'manual',

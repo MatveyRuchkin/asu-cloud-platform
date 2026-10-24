@@ -15,7 +15,7 @@ try {
         Write-Host "GitHub validation failed (HTTP $botHttpStatus). Check that the token is active, copied completely, and has Contents Read for asu-cloud-platform."
         exit 1
     }
-    $botValue | & $botNode node_modules\wrangler\bin\wrangler.js secret put GITHUB_TOKEN
+    $botValue | & $botNode scripts/put-secret.mjs GITHUB_TOKEN
     if ($LASTEXITCODE -ne 0) { throw 'Secret setup failed.' }
     # A PAT has an independent rate limit. Drop the anonymous-IP backoff only.
     & $botNode node_modules\wrangler\bin\wrangler.js d1 execute asu-team-bot --remote --command "DELETE FROM settings WHERE key='github_retry_at'"

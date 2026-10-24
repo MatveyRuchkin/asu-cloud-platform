@@ -10,7 +10,7 @@ $botWrangler = Join-Path (Get-Location) 'node_modules\wrangler\bin\wrangler.js'
 if (-not $WorkerUrl) { $WorkerUrl = Read-Host 'Worker URL (https://...workers.dev)' }
 if ($WorkerUrl -notmatch '^https://[a-zA-Z0-9.-]+\.workers\.dev/?$') { throw 'Use the HTTPS workers.dev URL.' }
 function Set-BotSecret([string]$Name, [string]$Value) {
-    $Value | & $botNode $botWrangler secret put $Name
+    $Value | & $botNode scripts/put-secret.mjs $Name
     if ($LASTEXITCODE -ne 0) { throw "Secret setup failed: $Name" }
 }
 function New-BotSecret {
@@ -21,7 +21,7 @@ function New-BotSecret {
 }
 $botSecure = Read-Host 'Telegram token from BotFather (input hidden)' -AsSecureString
 $botPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($botSecure)
-try { $botToken = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($botPointer) }
+try { $botToken = ([Runtime.InteropServices.Marshal]::PtrToStringBSTR($botPointer)).Trim() }
 finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($botPointer) }
 $botAdmins = Read-Host 'Your numeric Telegram ID (or comma-separated admin IDs)'
 if ($botAdmins -notmatch '^\d+(,\d+)*$') { throw 'Admin IDs must be numeric.' }
