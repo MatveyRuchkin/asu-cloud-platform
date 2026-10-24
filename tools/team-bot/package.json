@@ -1,0 +1,31 @@
+{
+  "name": "asu-team-bot",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "check": "tsc --noEmit",
+    "format": "prettier --write src tests probe scripts/*.mjs *.json *.jsonc *.ts",
+    "format:check": "prettier --check src tests probe scripts/*.mjs *.json *.jsonc *.ts",
+    "test": "vitest run",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "wrangler deploy",
+    "probe:deploy": "wrangler deploy --config probe/wrangler.jsonc",
+    "telegram": "node scripts/telegram.mjs",
+    "ai:eval": "node scripts/evaluate-ai.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261023.1",
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.28.2",
+    "miniflare": "^4.20260730.0",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.152.0"
+  }
+}
