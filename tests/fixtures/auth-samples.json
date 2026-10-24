@@ -1,0 +1,116 @@
+{
+  "description": "Вымышленные тестовые данные для проверки регистрации и входа (QA-02). Данные используются только для ручного тестирования.",
+  "register": {
+    "success": {
+      "description": "Сценарий 1. Регистрация. Успешный кейс",
+      "method": "POST",
+      "url": "/api/v1/auth/register",
+      "body": {
+        "email": "maria.ivanova.test@example.com",
+        "password": "StrongPass123",
+        "display_name": "Мария Иванова",
+        "university_id": "b7f62c8a-9e42-4d71-b803-02ab7d94e861"
+      }
+    },
+    "empty_fields": {
+      "description": "Сценарий 3. Регистрация. Пустые обязательные поля",
+      "method": "POST",
+      "url": "/api/v1/auth/register",
+      "body": {
+        "email": "",
+        "password": "",
+        "display_name": "",
+        "university_id": ""
+      }
+    },
+    "invalid_email": {
+      "description": "Сценарий 4. Регистрация. Невалидный email",
+      "method": "POST",
+      "url": "/api/v1/auth/register",
+      "variants": [
+        {
+          "email": "test.user",
+          "password": "StrongPass123",
+          "display_name": "Тестовый Пользователь",
+          "university_id": "7c9ab826-5fd4-4e32-b708-12c07de94f62"
+        },
+        {
+          "email": "user@",
+          "password": "StrongPass123",
+          "display_name": "Тестовый Пользователь",
+          "university_id": "7c9ab826-5fd4-4e32-b708-12c07de94f62"
+        },
+        {
+          "email": "@example.com",
+          "password": "StrongPass123",
+          "display_name": "Тестовый Пользователь",
+          "university_id": "7c9ab826-5fd4-4e32-b708-12c07de94f62"
+        }
+      ]
+    },
+    "short_password": {
+      "description": "Сценарий 5. Регистрация. Короткий пароль (< 8 символов)",
+      "method": "POST",
+      "url": "/api/v1/auth/register",
+      "body": {
+        "email": "alexey.petrov.test@example.com",
+        "password": "Pass123",
+        "display_name": "Алексей Петров",
+        "university_id": "62ab874c-9d52-4e71-b906-73f812dc9654"
+      }
+    },
+    "invalid_university_id_format": {
+      "description": "Сценарий 6. Регистрация. Невалидный формат university_id",
+      "method": "POST",
+      "url": "/api/v1/auth/register",
+      "variants": [
+        {
+          "email": "dmitry.smirnov.test@example.com",
+          "password": "StrongPass123",
+          "display_name": "Дмитрий Смирнов",
+          "university_id": "12345"
+        },
+        {
+          "email": "elena.kuznetsova.test@example.com",
+          "password": "StrongPass123",
+          "display_name": "Елена Кузнецова",
+          "university_id": "not-a-uuid"
+        },
+        {
+          "email": "nikolai.kozlov.test@example.com",
+          "password": "StrongPass123",
+          "display_name": "Николай Козлов",
+          "university_id": ""
+        }
+      ]
+    }
+  },
+  "login": {
+    "success": {
+      "description": "Сценарий 2. Вход. Успешный кейс",
+      "method": "POST",
+      "url": "/api/v1/auth/login",
+      "body": {
+        "email": "maria.ivanova.test@example.com",
+        "password": "StrongPass123"
+      }
+    },
+    "wrong_credentials": {
+      "description": "Дополнительный сценарий. Вход. Неверные учётные данные (для полнота, ожидаем 401)",
+      "method": "POST",
+      "url": "/api/v1/auth/login",
+      "body": {
+        "email": "maria.ivanova.test@example.com",
+        "password": "WrongPass456"
+      }
+    }
+  }
+}
+```
+
+## Шаг 3. Результат
+Создан файл:
+- `tests/fixtures/auth-samples.json`
+
+Содержимое показано выше. Данные вымышленные, пригодны для повторения. Для `university_id` использованы валидные по формату UUID и, отдельно, невалидные форматы.
+
