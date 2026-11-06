@@ -1,0 +1,190 @@
+/* Стили страницы входа и регистрации (FE-02).
+   Используются общие переменные из src/styles/main.css, чтобы не вводить новый дизайн. */
+
+.auth {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: calc(var(--space) * 1.5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) * 1.5);
+  box-shadow: 0 10px 30px rgba(31, 41, 51, 0.06);
+}
+
+.auth__title {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+
+.auth__subtitle {
+  margin: 0 0 var(--space);
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.auth__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: var(--space);
+  background: var(--color-bg);
+  border-radius: var(--radius);
+}
+
+.auth__tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth__tab[aria-selected='true'] {
+  background: var(--color-surface);
+  color: var(--color-accent);
+  box-shadow: 0 1px 3px rgba(31, 41, 51, 0.12);
+}
+
+.auth__tab:focus-visible,
+.auth-field__toggle:focus-visible,
+.auth-link:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.5);
+  outline-offset: 2px;
+}
+
+.auth-form {
+  margin: 0;
+}
+
+.auth-field {
+  margin-bottom: var(--space);
+}
+
+.auth-field__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.auth-field__control {
+  position: relative;
+}
+
+.auth-field__input,
+.auth-field__select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.auth-field__input:focus,
+.auth-field__select:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+}
+
+.auth-field__input--invalid,
+.auth-field__input--invalid:focus,
+.auth-field__select--invalid,
+.auth-field__select--invalid:focus {
+  border-color: #b91c1c;
+}
+
+.auth-field__input--with-toggle {
+  padding-right: 84px;
+}
+
+.auth-field__toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.auth-field__hint {
+  margin: 6px 0 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.auth-field__error {
+  margin: 6px 0 0;
+  color: #b91c1c;
+  font-size: 0.85rem;
+}
+
+.auth-alert {
+  padding: 10px 12px;
+  margin: 0 0 var(--space);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.auth-alert--error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.auth-alert--success {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.auth-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.auth-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .auth {
+    padding: var(--space);
+  }
+}

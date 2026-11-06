@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import AuthView from '@/views/AuthView.vue'
 import PlaceholderView from '@/views/PlaceholderView.vue'
 
 // Маршруты каркаса. Содержимое страниц — задача FE-02…FE-04, владелец каркаса — FE-01.
@@ -10,7 +11,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: PlaceholderView,
+      component: AuthView,
       meta: { title: 'Вход и регистрация' },
     },
     {
