@@ -1,0 +1,72 @@
+[
+  {
+    "category": "Электроника",
+    "title": "Продам калькулятор",
+    "description": "Научный калькулятор, исправен.",
+    "price_rub": 1500,
+    "image_url": "https://example.com/images/calculator.jpg"
+  },
+  {
+    "category": "Книги",
+    "title": "Учебник по информатике",
+    "description": "Учебник в хорошем состоянии.",
+    "price_rub": 450,
+    "image_url": null
+  },
+  {
+    "category": "Мебель",
+    "title": "Письменный стол",
+    "description": "Компактный стол для учебы.",
+    "price_rub": 3200,
+    "image_url": null
+  },
+  {
+    "category": "Одежда",
+    "title": "Зимняя куртка",
+    "description": "Теплая куртка, размер M.",
+    "price_rub": 2800,
+    "image_url": null
+  },
+  {
+    "category": "Спорт",
+    "title": "Гантели 5 кг",
+    "description": "Пара гантелей для домашних тренировок.",
+    "price_rub": 1200,
+    "image_url": null
+  },
+  {
+    "category": "Электроника",
+    "title": "Настольная лампа",
+    "description": "Светодиодная лампа с регулировкой яркости.",
+    "price_rub": 900,
+    "image_url": null
+  },
+  {
+    "category": "Канцелярия",
+    "title": "Набор тетрадей",
+    "description": "Пять новых тетрадей в клетку.",
+    "price_rub": 300,
+    "image_url": null
+  },
+  {
+    "category": "Бытовая техника",
+    "title": "Электрический чайник",
+    "description": "Чайник объемом 1,7 литра.",
+    "price_rub": 1100,
+    "image_url": null
+  },
+  {
+    "category": "Игры",
+    "title": "Настольная игра",
+    "description": "Комплект полный, все детали на месте.",
+    "price_rub": 0,
+    "image_url": null
+  },
+  {
+    "category": "Аксессуары",
+    "title": "Рюкзак для ноутбука",
+    "description": "Рюкзак с отделением для ноутбука 15 дюймов.",
+    "price_rub": null,
+    "image_url": null
+  }
+]
