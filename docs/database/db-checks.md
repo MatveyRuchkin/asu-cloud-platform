@@ -10,7 +10,11 @@
 ```powershell
 $env:DATABASE_URL = "postgresql+psycopg://app:app@localhost:5432/app"
 backend\.venv\Scripts\alembic.exe -c backend\alembic.ini upgrade head
-psql $env:DATABASE_URL -f data/demo/db_seed.sql
+$env:PGDATABASE = "app"
+$env:PGUSER = "app"
+# Пароль вводится psql интерактивно; DATABASE_URL SQLAlchemy не подходит для psql.
+psql -h 127.0.0.1 -W -v ON_ERROR_STOP=1 -f data/demo/db_seed.sql
+```
 
 Данные полностью вымышленные: адреса используют зарезервированный домен
 example.test, а поле password_hash не содержит настоящих паролей.

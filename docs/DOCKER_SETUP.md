@@ -1,99 +1,128 @@
-# Локальный PostgreSQL — DOCKER-01
+# PostgreSQL и API в Docker
 
-## Состав и блокер
+Два Compose-файла: `compose.yaml` запускает PostgreSQL 18, а
+`compose.api.yaml` добавляет существующий FastAPI backend. Второй файл используют
+вместе с первым. Docker автоматически объединяет сервисы в сеть одного проекта;
+API подключается к `db:5432`, независимо от порта БД на компьютере.
+Проброшенные порты доступны только с этого компьютера:
 
-Compose запускает только PostgreSQL 18 (`postgres:18`). Каркас backend Сергеенко
-ещё не добавлен в upstream `dev`: нет исходников, зависимостей и команды запуска.
-Поэтому сервис backend и `backend/Dockerfile` не создаются. После появления каркаса
-нужно согласовать подключение с Константином Лаврецким и Михаилом Сергеенко,
-параметры БД — также с Владиславом Коптеловым, затем добавить Dockerfile,
-зависимость от здоровой БД и проверить запуск обоих сервисов. API и миграции
-в этой задаче не изменяются. Версия PostgreSQL 18 выбрана по запросу исполнителя;
-её совместимость с backend ещё предстоит подтвердить на ревью.
+| Сервис | Адрес на компьютере | Адрес внутри Docker |
+| --- | --- | --- |
+| PostgreSQL | `127.0.0.1:5432` | `db:5432` |
+| API | `http://127.0.0.1:8000` | `api:8000` |
 
-## Подготовка
+Нужен Docker Engine с Linux-контейнерами и Docker Compose v2 или новее
+с поддержкой `--wait`, например Docker Desktop. Все команды ниже — PowerShell,
+из корня репозитория.
 
-Нужны Docker Engine с Linux-контейнерами и Docker Compose v2 с поддержкой `--wait`
-(например, Docker Desktop). Выполняйте команды из корня репозитория.
+## Настройка один раз
 
-```console
+```powershell
+cd D:\ASU_TG_BOT
 docker version
 docker compose version
 ```
 
-Скопируйте `.env.example` в `.env`: `cp .env.example .env` в Linux/macOS
-или `Copy-Item .env.example .env` в PowerShell. Задайте в `.env` непустой
-уникальный `POSTGRES_PASSWORD`; рекомендуется случайная строка из букв и цифр.
-Шаблон намеренно содержит пустой пароль, поэтому без настройки Compose завершится
-ошибкой. `.env` уже исключён из Git. Не публикуйте вывод конфигурации с паролем.
+Docker должен показать версию и Client, и Server. Если Server недоступен,
+откройте Docker Desktop и дождитесь готовности Engine.
 
-| Переменная | Назначение | По умолчанию |
-| --- | --- | --- |
-| `POSTGRES_DB` | Имя локальной БД | `asu_cloud` |
-| `POSTGRES_USER` | Пользователь инициализации | `asu_cloud` |
-| `POSTGRES_PASSWORD` | Пароль локальной БД | Обязателен, без значения |
-| `POSTGRES_PORT` | Порт на компьютере | `5432` |
+Если `.env` ещё нет, создайте его и заполните два случайных секрета:
 
-Порт доступен только на `127.0.0.1`. Если 5432 занят, задайте, например,
-`POSTGRES_PORT=5433`. Для подключения с компьютера используйте `127.0.0.1`,
-выбранный порт и значения из `.env`. Будущий backend внутри Compose должен
-подключаться к `db:5432`; формат его настроек определит существующий каркас.
-Пользователь `POSTGRES_USER` имеет права суперпользователя: это локальное окружение,
-для production понадобится отдельная настройка прав и секретов.
-
-## Запуск и проверка
-
-```console
-docker compose config --quiet
-docker compose up -d --wait --wait-timeout 120
-docker compose ps
-docker compose exec db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT version();"'
+```powershell
+if (-not (Test-Path .env)) {
+    $rng = [Security.Cryptography.RandomNumberGenerator]::Create()
+    $bytes = New-Object byte[] 32
+    $rng.GetBytes($bytes)
+    $dbPassword = ([BitConverter]::ToString($bytes)).Replace('-', '').ToLowerInvariant()
+    $rng.GetBytes($bytes)
+    $jwtKey = ([BitConverter]::ToString($bytes)).Replace('-', '').ToLowerInvariant()
+    $rng.Dispose()
+    $envText = (Get-Content .env.example -Raw).Replace('POSTGRES_PASSWORD=', "POSTGRES_PASSWORD=$dbPassword").Replace('SECRET_KEY=', "SECRET_KEY=$jwtKey")
+    [IO.File]::WriteAllText((Join-Path (Get-Location) '.env'), $envText)
+    Remove-Variable dbPassword,jwtKey,envText,bytes,rng
+}
 ```
 
-Ожидается сервис `db` в состоянии `healthy` и версия PostgreSQL 18.
-Healthcheck проверяет готовность через `pg_isready`, а не правильность пароля.
-Для отдельной проверки TCP-аутентификации выполните команду ниже и введите
-свой пароль по запросу (он не попадёт в историю команд):
+Для существующего `.env` сохраните текущие настройки БД и добавьте отсутствующие
+поля из `.env.example`. `SECRET_KEY` — случайная строка минимум 32 байта;
+при смене ключа старые токены входа перестанут работать.
+Не публикуйте `.env` или вывод `docker compose config` без `--quiet`.
+Пароль БД не имеет значения по умолчанию. Спецсимволы в пароле корректно
+кодируются в строке подключения API; в `.env` соблюдайте правила кавычек Docker.
 
-```console
-docker compose exec db sh -c 'psql -h 127.0.0.1 -W -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 1;"'
+## Запустить только БД
+
+```powershell
+docker compose -f compose.yaml config --quiet
+docker compose -f compose.yaml up -d --wait --wait-timeout 120
+docker compose -f compose.yaml ps
 ```
 
-## Проверка сохранности данных
+Ожидается `db` со статусом `healthy`. Подключение с компьютера:
+`127.0.0.1:5432`, имя БД и пользователь — `asu_cloud`, пароль — из `.env`.
 
-Следующие команды подходят для Bash и PowerShell 7. Они создают служебную
-таблицу только для ручной проверки локального окружения, затем удаляют её.
-Выполняйте их последовательно, проверяя код завершения каждой команды.
+## Запустить БД и API
 
-```console
-docker compose exec db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "CREATE TABLE docker01_persistence_probe (id integer PRIMARY KEY); INSERT INTO docker01_persistence_probe VALUES (17);"'
-docker compose down
-docker compose up -d --wait --wait-timeout 120
-docker compose exec db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT id FROM docker01_persistence_probe;"'
-docker compose exec db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "DROP TABLE docker01_persistence_probe;"'
+```powershell
+docker compose -f compose.yaml -f compose.api.yaml config --quiet
+docker compose -f compose.yaml -f compose.api.yaml up -d --build --wait --wait-timeout 180
+docker compose -f compose.yaml -f compose.api.yaml ps
+Invoke-RestMethod http://127.0.0.1:8000/api/v1/health
+Start-Process http://127.0.0.1:8000/docs
 ```
 
-После пересоздания контейнера запрос должен вернуть `17`. `docker compose down`
-сохраняет именованный volume `postgres_data`. В PostgreSQL 18 volume монтируется
-в `/var/lib/postgresql`, а данные по умолчанию лежат в `18/docker` внутри него:
-[документация официального образа](https://github.com/docker-library/docs/blob/master/postgres/README.md#pgdata).
-Не используйте для этой версии старую точку монтирования `/var/lib/postgresql/data`.
+Ожидаются два сервиса `healthy`, ответ `status: ok` и Swagger UI.
+API сначала ждёт готовности PostgreSQL и применяет `alembic upgrade head`.
+При ошибке миграции API не запускается. Перед миграцией существующей базы
+сохраните резервную копию. Автоматическая загрузка демо-данных не выполняется.
 
-## Остановка и диагностика
+На новой базе список вузов пуст. Для локальной демонстрации можно один раз
+загрузить существующие вымышленные данные после запуска API:
 
-```console
-docker compose logs --tail=100 db
-docker compose down
+```powershell
+Get-Content data/demo/db_seed.sql -Raw | docker compose -f compose.yaml exec -T db sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+Invoke-RestMethod http://127.0.0.1:8000/api/v1/universities
 ```
 
-`docker compose down --volumes` **удалит локальные данные БД**. Используйте только
-для намеренного сброса ненужного окружения. Переменные инициализации применяются
-лишь к пустому volume: изменение пароля, пользователя или имени БД в `.env`
-не меняет существующую БД. Для сохранения данных меняйте настройки средствами SQL;
-для полного сброса сначала сделайте резервную копию. Не меняйте major-версию образа
-на существующем volume без процедуры обновления PostgreSQL.
+Ожидаются два вуза. Seed предназначен для чистой базы: повторно его не загружайте.
+Демо-хэши пользователей не подходят для входа; зарегистрируйте нового пользователя
+через API с одним из UUID полученных вузов. Работают регистрация, вход и профиль.
+Backend объявлений и форума ещё не реализован; их наличие в Swagger-контракте
+не означает готовности серверных обработчиков.
 
-`.dockerignore` подготовлен для будущего контекста сборки из корня; текущий сервис
-использует готовый образ и ничего не собирает. Фактически выполненные проверки
-и ограничения окружения перечисляются в PR; команды выше — инструкция повторения,
-а не утверждение об успешном запуске.
+Frontend запускают отдельно по `frontend/README.md`; адрес API по умолчанию —
+`http://localhost:8000/api/v1`.
+
+## Порты, сохранность и диагностика
+
+Если 5432 занят, измените в `.env` `POSTGRES_PORT=5433`. Если занят 8000,
+установите `API_PORT=8001` и измените адрес API во frontend и командах проверки.
+Внутренний адрес БД остаётся `db:5432`. Пользователь PostgreSQL в этом локальном
+окружении — суперпользователь; для публичного сервера нужны отдельные права.
+
+Данные PostgreSQL хранятся в именованном volume `postgres_data`, путь контейнера
+для PostgreSQL 18 — `/var/lib/postgresql`. Остановка сохраняет данные:
+
+```powershell
+docker compose -f compose.yaml -f compose.api.yaml down
+```
+
+Не используйте `down --volumes`, если хотите сохранить данные. Запускайте
+из той же папки с тем же именем Compose-проекта, чтобы подключался прежний volume.
+После повторного `up` зарегистрированные пользователи и данные должны сохраниться.
+
+При ошибке:
+
+```powershell
+docker compose -f compose.yaml -f compose.api.yaml ps
+docker compose -f compose.yaml -f compose.api.yaml logs --tail 60 api db
+```
+
+`port is already allocated` — измените внешний порт. `SECRET_KEY must contain...`
+— заполните ключ. Ошибка пароля PostgreSQL на существующем volume — используйте
+пароль, с которым база была создана: смена `.env` не меняет пароль в сохранённой БД.
+Ошибку миграции устраняют до запуска API, сохраняя данные и текст ошибки без секретов.
+
+Справка: [объединение Compose-файлов](https://docs.docker.com/compose/how-tos/multiple-compose-files/merge/),
+[сеть Compose](https://docs.docker.com/compose/how-tos/networking/),
+[официальный образ PostgreSQL](https://hub.docker.com/_/postgres).

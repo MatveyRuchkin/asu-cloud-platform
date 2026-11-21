@@ -29,7 +29,11 @@ $env:DATABASE_URL = "postgresql+psycopg://app:app@localhost:5432/app"
 Порядок запуска
 Из корня репозитория:
 backend\.venv\Scripts\alembic.exe -c backend\alembic.ini upgrade head
-psql $env:DATABASE_URL -v ON_ERROR_STOP=1 -f tests/database/check_initial_migration.sql
+$env:PGDATABASE = "app"
+$env:PGUSER = "app"
+# psql использует собственные параметры, не URL драйвера SQLAlchemy.
+psql -h 127.0.0.1 -W -v ON_ERROR_STOP=1 -f tests/database/check_initial_migration.sql
+```
 Ожидаемый результат
 После применения миграции создаются таблицы:
 - alembic_version;

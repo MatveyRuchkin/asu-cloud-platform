@@ -1,0 +1,26 @@
+# API is an extension of compose.yaml. Start both with:
+# docker compose -f compose.yaml -f compose.api.yaml up -d --build --wait
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-asu_cloud}
+      POSTGRES_USER: ${POSTGRES_USER:-asu_cloud}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      SECRET_KEY: ${SECRET_KEY:?Set a random SECRET_KEY of at least 32 bytes in .env}
+      CORS_ORIGINS: '${CORS_ORIGINS:-["http://localhost:5173","http://127.0.0.1:5173"]}'
+      DEBUG: "false"
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s

@@ -46,10 +46,7 @@ Issue: #16
 
 1. Открыть корень репозитория в терминале.
 2. Выполнить python -m json.tool data/demo/ads.json — команда должна завершиться без ошибок.
-3. При наличии Python выполнить python -c "import json; a=json.load(open('data/demo/ads.json', encoding='utf-8')); assert isinstance(a
-
-
-list) and len(a)==10; print('OK: 10 ads')".
+3. При наличии Python выполнить python -c "import json; a=json.load(open('data/demo/ads.json', encoding='utf-8')); assert isinstance(a, list) and len(a)==10; print('OK: 10 ads')".
 4. После утверждения схемы и запуска API отправлять каждый объект на POST /ads согласно требованиям авторизации и формату из OpenAPI. Для негативных сценариев менять копию объекта, не изменяя исходный ads.json.
 5. Записать фактический HTTP-статус, тело ответа и результат для каждого сценария; при недоступности API оставить отметку «блокер» и сообщить лиду.
 

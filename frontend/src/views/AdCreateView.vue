@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 
@@ -29,12 +28,7 @@ const emit = defineEmits<{
   created: [ad: Ad]
 }>()
 
-type FieldName =
-  | 'category_id'
-  | 'title'
-  | 'description'
-  | 'price_rub'
-  | 'image_url'
+type FieldName = 'category_id' | 'title' | 'description' | 'price_rub' | 'image_url'
 
 const form = reactive({
   category_id: '',
@@ -50,8 +44,7 @@ const isSubmitting = ref(false)
 const serverError = ref('')
 const successMessage = ref('')
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function clearErrors() {
   for (const field of Object.keys(errors) as FieldName[]) {
@@ -75,9 +68,7 @@ function validateForm(): boolean {
   successMessage.value = ''
 
   // Проверяем, что выбрана настоящая категория.
-  const selectedCategory = props.categories.find(
-    (category) => category.id === form.category_id,
-  )
+  const selectedCategory = props.categories.find((category) => category.id === form.category_id)
 
   if (!props.categories.length) {
     errors.category_id = 'Список категорий пока недоступен.'
@@ -101,11 +92,7 @@ function validateForm(): boolean {
   if (price !== '') {
     const numericPrice = Number(price)
 
-    if (
-        !/^\d+$/.test(price) ||
-        !Number.isSafeInteger(numericPrice) ||
-        numericPrice < 0
-    ) {
+    if (!/^\d+$/.test(price) || !Number.isSafeInteger(numericPrice) || numericPrice < 0) {
       errors.price_rub = 'Введите целое число от 0 или оставьте поле пустым.'
     }
   }
@@ -137,8 +124,7 @@ async function submitForm() {
 
   // Токен должен передаваться механизмом авторизации.
   if (!props.accessToken) {
-    serverError.value =
-      'Для создания объявления необходимо войти в систему.'
+    serverError.value = 'Для создания объявления необходимо войти в систему.'
     return
   }
 
@@ -181,14 +167,12 @@ async function submitForm() {
   <main class="page ad-create">
     <header class="ad-create__header">
       <h1 class="page__title">Создать объявление</h1>
-      <p class="ad-create__subtitle">
-        Заполните информацию о своём предложении.
-      </p>
+      <p class="ad-create__subtitle">Заполните информацию о своём предложении.</p>
     </header>
 
     <div v-if="!props.categories.length" class="form-notice">
-      Список категорий пока не подключён. Форма станет доступна после
-      получения настоящих категорий от приложения.
+      Список категорий пока не подключён. Форма станет доступна после получения настоящих категорий
+      от приложения.
     </div>
 
     <div v-if="!props.accessToken" class="form-notice">
@@ -212,11 +196,7 @@ async function submitForm() {
         >
           <option value="" disabled>Выберите категорию</option>
 
-          <option
-            v-for="category in props.categories"
-            :key="category.id"
-            :value="category.id"
-          >
+          <option v-for="category in props.categories" :key="category.id" :value="category.id">
             {{ category.name }}
           </option>
         </select>
@@ -272,9 +252,7 @@ async function submitForm() {
 
       <!-- Цена -->
       <div class="form-field">
-        <label for="ad-price" class="form-field__label">
-          Цена, ₽
-        </label>
+        <label for="ad-price" class="form-field__label"> Цена, ₽ </label>
 
         <input
           id="ad-price"
@@ -287,9 +265,7 @@ async function submitForm() {
           :aria-invalid="Boolean(errors.price_rub)"
         />
 
-        <small class="form-field__hint">
-          Необязательно. Целое число или пустое значение.
-        </small>
+        <small class="form-field__hint"> Необязательно. Целое число или пустое значение. </small>
 
         <p v-if="errors.price_rub" class="form-field__error">
           {{ errors.price_rub }}
@@ -298,9 +274,7 @@ async function submitForm() {
 
       <!-- Ссылка на фотографию -->
       <div class="form-field">
-        <label for="ad-image-url" class="form-field__label">
-          Ссылка на фотографию
-        </label>
+        <label for="ad-image-url" class="form-field__label"> Ссылка на фотографию </label>
 
         <input
           id="ad-image-url"
@@ -312,9 +286,7 @@ async function submitForm() {
           :aria-invalid="Boolean(errors.image_url)"
         />
 
-        <small class="form-field__hint">
-          Необязательно. Укажите ссылку на изображение.
-        </small>
+        <small class="form-field__hint"> Необязательно. Укажите ссылку на изображение. </small>
 
         <p v-if="errors.image_url" class="form-field__error">
           {{ errors.image_url }}
@@ -326,19 +298,11 @@ async function submitForm() {
         {{ serverError }}
       </p>
 
-      <p
-        v-if="successMessage"
-        class="form-message form-message--success"
-        role="status"
-      >
+      <p v-if="successMessage" class="form-message form-message--success" role="status">
         {{ successMessage }}
       </p>
 
-      <button
-        class="ad-form__submit"
-        type="submit"
-        :disabled="isSubmitting"
-      >
+      <button class="ad-form__submit" type="submit" :disabled="isSubmitting">
         {{ isSubmitting ? 'Отправка...' : 'Создать объявление' }}
       </button>
     </form>
