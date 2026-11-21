@@ -2,13 +2,17 @@ openapi: 3.0.3
 info:
   title: Student Platform API (DRAFT)
   version: 0.1.0
-  description: Черновик для согласования. Не изменять маршруты или поля без review.
+  description: >-
+    Черновик для согласования в Issue #13. Маршруты, JSON-поля, типы,
+    статусы и формат ошибок не изменяются без review backend, frontend, БД и QA.
+    Зафиксированные правила и открытые вопросы перечислены в docs/api/decisions.md.
 servers:
   - url: http://localhost:8000/api/v1
 paths:
   /health:
     get:
       summary: Проверка работы сервера
+      security: []
       responses:
         '200':
           description: OK
@@ -22,6 +26,7 @@ paths:
   /auth/register:
     post:
       summary: Регистрация
+      security: []
       requestBody:
         required: true
         content:
@@ -38,6 +43,7 @@ paths:
   /auth/login:
     post:
       summary: Вход
+      security: []
       requestBody:
         required: true
         content:
@@ -66,6 +72,7 @@ paths:
   /universities:
     get:
       summary: Список университетов
+      security: []
       responses:
         '200':
           description: Университеты
@@ -77,6 +84,7 @@ paths:
   /ads:
     get:
       summary: Просмотр объявлений
+      security: []
       parameters:
         - {name: category_id, in: query, schema: {type: string, format: uuid}}
         - {name: university_id, in: query, schema: {type: string, format: uuid}}
@@ -107,6 +115,7 @@ paths:
   /forum/sections:
     get:
       summary: Разделы форума
+      security: []
       responses:
         '200':
           description: Список разделов
@@ -118,6 +127,7 @@ paths:
   /forum/topics:
     get:
       summary: Темы форума
+      security: []
       parameters:
         - {name: section_id, in: query, schema: {type: string, format: uuid}}
       responses:
