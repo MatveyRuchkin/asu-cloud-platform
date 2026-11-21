@@ -31,12 +31,12 @@ def test_startup_preserves_special_password_and_migrates_before_api(
         url = make_url(os.environ["DATABASE_URL"])
         assert url.password == "local-test:@/#% password"
         assert url.host == "db" and url.port == 5432
-        steps.append("migrate")
+        steps.append(args[0][2])
 
     monkeypatch.setattr(docker_entrypoint.subprocess, "run", migrate)
     monkeypatch.setattr(docker_entrypoint.os, "execv", lambda *args: steps.append("api"))
     docker_entrypoint.main()
-    assert steps == ["migrate", "api"]
+    assert steps == ["alembic", "app.seed_reference_data", "api"]
 
 
 @pytest.mark.usefixtures("compose_env")
@@ -74,7 +74,7 @@ def test_remote_database_uses_vm_address_and_published_port(
     assert url.host == "192.168.1.10" and url.port == 55432
     assert url.password == "local-test:@/#% password"
     docker_entrypoint.wait_for_database.assert_called_once_with(url)
-    migrate.assert_called_once()
+    assert migrate.call_count == 2
 
 
 @pytest.mark.usefixtures("compose_env")
@@ -89,4 +89,15 @@ def test_unavailable_database_prevents_migration_and_api_start(
     with pytest.raises(SystemExit, match="Database unavailable"):
         docker_entrypoint.main()
     migrate.assert_not_called()
+    start.assert_not_called()
+
+
+@pytest.mark.usefixtures("compose_env")
+def test_reference_setup_failure_prevents_server_start(monkeypatch: pytest.MonkeyPatch) -> None:
+    run = Mock(side_effect=[None, subprocess.CalledProcessError(1, "reference setup")])
+    start = Mock()
+    monkeypatch.setattr(docker_entrypoint.subprocess, "run", run)
+    monkeypatch.setattr(docker_entrypoint.os, "execv", start)
+    with pytest.raises(subprocess.CalledProcessError):
+        docker_entrypoint.main()
     start.assert_not_called()
