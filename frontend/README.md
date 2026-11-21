@@ -2,7 +2,8 @@
 
 Каркас Vue-приложения студенческой облачной платформы.
 
-**Каркас создан по Issue #5 (ARCH-01).** Решения по стеку и границам модулей —
+**Каркас создан по Issue #5 (ARCH-01).** Навигация и правила для страниц — Issue #8 (FE-01):
+[docs/frontend-shell.md](../docs/frontend-shell.md). Решения по стеку и границам модулей —
 [docs/architecture/decisions.md](../docs/architecture/decisions.md), структура и запуск —
 [docs/architecture/structure.md](../docs/architecture/structure.md).
 
@@ -52,10 +53,10 @@ npm run build        # сборка для production
 frontend/
 ├── src/
 │   ├── main.ts          # точка входа: Vue, Pinia, роутер
-│   ├── App.vue          # оболочка приложения (навигация — задача FE-01)
+│   ├── App.vue          # оболочка приложения (FE-01)
 │   ├── router/          # маршруты                      (FE-01)
 │   ├── views/           # страницы                      (FE-02…FE-04)
-│   ├── components/      # переиспользуемые элементы      (FE-01)
+│   ├── components/      # переиспользуемые элементы, навигация (FE-01)
 │   ├── api/             # вызов API и типы               (FE-01 + API-01)
 │   ├── stores/          # состояние Pinia                (FE-01)
 │   └── styles/          # общие стили, адаптивность       (FE-01 + UI-01)
@@ -69,6 +70,7 @@ frontend/
 
 ## Правила
 
+- Навигация одна: `src/components/AppNavigation.vue`. Раздел добавляется ссылкой в её `links` и маршрутом в `src/router/index.ts`; правила для страниц — [docs/frontend-shell.md](../docs/frontend-shell.md).
 - Компоненты не вызывают `fetch` напрямую: только через `src/api/http.ts`.
 - Имена полей в TypeScript повторяют контракт: `snake_case`, UUID строками, даты — ISO 8601 UTC.
 - Ошибки API приходят как `{code, message, details}`; пользователю показывают `message`.

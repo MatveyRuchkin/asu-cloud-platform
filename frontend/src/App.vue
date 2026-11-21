@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+
+import AppNavigation from '@/components/AppNavigation.vue'
 </script>
 
 <template>
   <div class="app">
-    <!--
-      Временная навигация каркаса: нужна, чтобы проверить маршруты.
-      Постоянный компонент навигации — задача FE-01 (Хапков), он заменит этот блок.
-    -->
-    <nav class="app__nav" aria-label="Основная навигация">
-      <RouterLink class="app__link" to="/login">Вход</RouterLink>
-      <RouterLink class="app__link" to="/ads">Объявления</RouterLink>
-      <RouterLink class="app__link" to="/forum">Форум</RouterLink>
-      <RouterLink class="app__link" to="/profile">Профиль</RouterLink>
-    </nav>
+    <!-- Оболочка приложения: навигация и область страницы. Страницы живут в src/views. -->
+    <AppNavigation />
 
-    <RouterView />
+    <main class="app__content">
+      <RouterView />
+    </main>
   </div>
 </template>
