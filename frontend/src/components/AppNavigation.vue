@@ -40,7 +40,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', closeOnEscape))
 
 <template>
   <header class="nav">
-    <RouterLink class="nav__brand" to="/login">ASU Cloud</RouterLink>
+    <RouterLink class="nav__brand" to="/ads">ASU Cloud</RouterLink>
 
     <button
       class="nav__toggle"

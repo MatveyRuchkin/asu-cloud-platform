@@ -27,7 +27,7 @@ body {
 }
 
 .app {
-  max-width: 960px;
+  max-width: 1160px;
   margin: 0 auto;
   padding: var(--space);
 }

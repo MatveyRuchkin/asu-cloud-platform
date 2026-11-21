@@ -7,7 +7,7 @@ import PlaceholderView from '@/views/PlaceholderView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/', redirect: '/login' },
+    { path: '/', redirect: '/ads' },
     {
       path: '/login',
       name: 'login',

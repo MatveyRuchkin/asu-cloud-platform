@@ -15,7 +15,7 @@ FE-01 дополняет его общей навигацией и правил�
 | `frontend/src/App.vue` | оболочка: навигация + область страницы | FE-01 |
 | `frontend/src/components/AppNavigation.vue` | общая навигация, мобильное меню | FE-01 |
 | `frontend/src/router/index.ts` | маршруты `/login`, `/ads`, `/forum`, `/profile` | FE-01 |
-| `frontend/src/views/PlaceholderView.vue` | страница-заглушка для проверки маршрутов | FE-02…FE-04 заменяют своими страницами |
+| `frontend/src/views/PlaceholderView.vue` | демо-страницы объявлений, форума и профиля с вымышленными данными | FE-02…FE-04 заменяют своими страницами |
 | `frontend/src/api/http.ts` | единственная точка запросов к API, разбор ошибок | FE-01 + API-01 |
 | `frontend/src/api/types.ts` | типы запросов и ответов по `openapi.yaml` | FE-01 + API-01 |
 | `frontend/src/styles/main.css` | переменные, общие стили, адаптивность | FE-01 + UI-01 |
@@ -35,7 +35,7 @@ Vue 3 (`<script setup lang="ts">`), TypeScript `strict`, Vite, Vue Router, Pinia
 
 | Путь | Имя (`name`) | Заголовок | Владелец экрана |
 | --- | --- | --- | --- |
-| `/` | — | редирект на `/login` | FE-01 |
+| `/` | — | редирект на `/ads` | FE-01 |
 | `/login` | `login` | Вход и регистрация | FE-02 (Юмина) |
 | `/ads` | `ads` | Объявления | FE-03 (Дилеев) |
 | `/forum` | `forum` | Форум | FE-04 (Шадунцев) |
