@@ -16,6 +16,9 @@ def compose_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("POSTGRES_DB", "asu_cloud")
     monkeypatch.setenv("SECRET_KEY", "local-test-key-32-bytes-or-longer-12345")
     monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("DB_HOST", raising=False)
+    monkeypatch.delenv("DB_PORT", raising=False)
+    monkeypatch.setattr(docker_entrypoint, "wait_for_database", Mock())
 
 
 @pytest.mark.usefixtures("compose_env")
@@ -55,3 +58,35 @@ def test_short_signing_key_stops_before_connecting(monkeypatch: pytest.MonkeyPat
     with pytest.raises(SystemExit, match="at least 32 bytes"):
         docker_entrypoint.main()
     migrate.assert_not_called()
+
+
+@pytest.mark.usefixtures("compose_env")
+def test_remote_database_uses_vm_address_and_published_port(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("DB_HOST", "192.168.1.10")
+    monkeypatch.setenv("DB_PORT", "55432")
+    migrate = Mock()
+    monkeypatch.setattr(docker_entrypoint.subprocess, "run", migrate)
+    monkeypatch.setattr(docker_entrypoint.os, "execv", Mock())
+    docker_entrypoint.main()
+    url = make_url(os.environ["DATABASE_URL"])
+    assert url.host == "192.168.1.10" and url.port == 55432
+    assert url.password == "local-test:@/#% password"
+    docker_entrypoint.wait_for_database.assert_called_once_with(url)
+    migrate.assert_called_once()
+
+
+@pytest.mark.usefixtures("compose_env")
+def test_unavailable_database_prevents_migration_and_api_start(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    wait = Mock(side_effect=SystemExit("Database unavailable"))
+    migrate, start = Mock(), Mock()
+    monkeypatch.setattr(docker_entrypoint, "wait_for_database", wait)
+    monkeypatch.setattr(docker_entrypoint.subprocess, "run", migrate)
+    monkeypatch.setattr(docker_entrypoint.os, "execv", start)
+    with pytest.raises(SystemExit, match="Database unavailable"):
+        docker_entrypoint.main()
+    migrate.assert_not_called()
+    start.assert_not_called()
