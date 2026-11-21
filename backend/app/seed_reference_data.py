@@ -8,17 +8,19 @@ from sqlalchemy.orm import Session
 from app.db.models import University
 from app.modules.ads.models import AdCategory
 from app.modules.forum.models import ForumSection
+from app.modules.universities.catalog import RUSSIAN_UNIVERSITIES
 
 
 def seed(session: Session) -> None:
     """Add missing reference names without overwriting existing records."""
     for model, names in [
-        (University, ["Учебный университет"]),
+        (University, RUSSIAN_UNIVERSITIES),
         (AdCategory, ["Учебники", "Техника", "Услуги"]),
         (ForumSection, ["Учёба", "Кампус", "Общение"]),
     ]:
+        existing = set(session.scalars(select(model.name).where(model.name.in_(names))))
         for name in names:
-            if session.scalar(select(model.id).where(model.name == name)) is None:
+            if name not in existing:
                 session.add(model(name=name))
     session.commit()
 

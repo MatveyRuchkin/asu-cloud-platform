@@ -46,6 +46,7 @@ def main() -> None:
     os.environ["DATABASE_URL"] = url.render_as_string(hide_password=False)
     wait_for_database(url)
     subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], check=True)
+    subprocess.run([sys.executable, "-m", "app.seed_reference_data"], check=True)
     os.execv(
         sys.executable,
         [sys.executable, "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"],

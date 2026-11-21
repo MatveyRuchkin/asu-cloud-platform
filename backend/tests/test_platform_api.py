@@ -14,6 +14,7 @@ from app.db.session import get_session
 from app.main import app
 from app.modules.ads.models import Ad, AdCategory
 from app.modules.forum.models import ForumSection, ForumTopic
+from app.modules.universities.catalog import RUSSIAN_UNIVERSITIES
 from app.seed_reference_data import seed
 
 
@@ -173,7 +174,7 @@ def test_reference_seed_is_repeatable_and_does_not_create_users_or_ads(platform)
         seed(session)
         seed(session)
         for model, count in [
-            (University, 1),
+            (University, len(RUSSIAN_UNIVERSITIES)),
             (AdCategory, 3),
             (ForumSection, 3),
             (User, 0),
@@ -203,3 +204,25 @@ def test_reference_cli_uses_compose_environment_without_database_url(platform, m
     assert url.host == "10.10.214.122" and url.port == 55432
     assert url.database == "vm_db" and url.username == "vm_user"
     assert url.password == "local-test:@/#%"
+
+
+def test_university_directory_is_served_and_existing_ids_are_preserved(platform) -> None:
+    client, factory = platform
+    before = client.get("/api/v1/universities").json()
+    assert len(before) == 30
+    assert len({row["name"] for row in before}) == 30
+    assert any("МАДИ" in row["name"] for row in before)
+    with factory() as session:
+        existing = session.scalars(select(University)).first()
+        preserved_id, preserved_name = existing.id, existing.name
+        custom = University(name="Существующий вуз команды")
+        session.add(custom)
+        session.commit()
+        custom_id = custom.id
+        seed(session)
+        seed(session)
+        assert session.get(University, preserved_id).name == preserved_name
+        assert session.get(University, custom_id).name == "Существующий вуз команды"
+    after = client.get("/api/v1/universities").json()
+    assert len(after) == 31
+    assert set(RUSSIAN_UNIVERSITIES).issubset(row["name"] for row in after)
