@@ -164,7 +164,7 @@ async function submitForm() {
 </script>
 
 <template>
-  <main class="page ad-create">
+  <section class="page ad-create">
     <header class="ad-create__header">
       <h1 class="page__title">Создать объявление</h1>
       <p class="ad-create__subtitle">Заполните информацию о своём предложении.</p>
@@ -306,7 +306,7 @@ async function submitForm() {
         {{ isSubmitting ? 'Отправка...' : 'Создать объявление' }}
       </button>
     </form>
-  </main>
+  </section>
 </template>
 
 <style scoped>

@@ -6,9 +6,10 @@
  * Формат ошибки — `{code, message, details}` (контракт `docs/api/openapi.yaml`).
  */
 
+import { accessToken, saveToken } from '@/stores/session'
 import type { ApiErrorPayload } from './types'
 
-const FALLBACK_BASE_URL = 'http://localhost:8000/api/v1'
+const FALLBACK_BASE_URL = '/api/v1'
 
 /** Базовый адрес API: значение из `.env` (см. `.env.example`). */
 export function apiBaseUrl(): string {
@@ -43,7 +44,7 @@ export interface ApiRequestOptions {
 
 /** Выполняет запрос к API и возвращает разобранный ответ. */
 export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
-  const { body, token, method = 'GET', headers, ...rest } = options
+  const { body, token = accessToken.value, method = 'GET', headers, ...rest } = options
 
   const response = await fetch(`${apiBaseUrl()}${path}`, {
     ...rest,
@@ -58,6 +59,7 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   })
 
   if (!response.ok) {
+    if (response.status === 401) saveToken(null)
     throw new ApiError(response.status, await readError(response))
   }
 

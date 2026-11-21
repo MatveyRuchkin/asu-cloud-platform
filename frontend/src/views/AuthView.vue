@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import LoginForm from './auth/LoginForm.vue'
 import RegisterForm from './auth/RegisterForm.vue'
 import type { AuthMode } from './auth/types'
 import './auth/auth.css'
 
+const router = useRouter()
 const mode = ref<AuthMode>('login')
 const loginEmail = ref('')
 const notice = ref('')
@@ -60,7 +62,7 @@ function handleRegistered(email: string) {
     <p v-if="notice" class="auth-alert auth-alert--success" role="status">{{ notice }}</p>
 
     <div v-show="mode === 'login'" id="panel-login" role="tabpanel" aria-labelledby="tab-login">
-      <LoginForm :initial-email="loginEmail" />
+      <LoginForm :initial-email="loginEmail" @success="router.push('/profile')" />
     </div>
 
     <div

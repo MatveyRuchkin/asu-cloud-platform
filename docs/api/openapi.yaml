@@ -81,6 +81,18 @@ paths:
               schema:
                 type: array
                 items: {$ref: '#/components/schemas/University'}
+  /ad-categories:
+    get:
+      summary: Категории объявлений из БД
+      security: []
+      responses:
+        '200':
+          description: Список категорий
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/AdCategory'}
   /ads:
     get:
       summary: Просмотр объявлений
@@ -112,6 +124,13 @@ paths:
               schema: {$ref: '#/components/schemas/Ad'}
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          description: Ошибка валидации полей
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Error'}
   /forum/sections:
     get:
       summary: Разделы форума
@@ -195,15 +214,21 @@ components:
       properties:
         id: {type: string, format: uuid}
         name: {type: string}
+    AdCategory:
+      type: object
+      required: [id, name]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
     AdCreate:
       type: object
       required: [category_id, title, description]
       properties:
         category_id: {type: string, format: uuid}
-        title: {type: string, minLength: 3}
+        title: {type: string, minLength: 3, maxLength: 255}
         description: {type: string, minLength: 1}
-        price_rub: {type: integer, nullable: true, minimum: 0}
-        image_url: {type: string, format: uri, nullable: true}
+        price_rub: {type: integer, nullable: true, minimum: 0, maximum: 2147483647}
+        image_url: {type: string, format: uri, nullable: true, maxLength: 2048}
     Ad:
       allOf:
         - {$ref: '#/components/schemas/AdCreate'}

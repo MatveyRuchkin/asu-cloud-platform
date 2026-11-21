@@ -15,7 +15,7 @@ FE-01 дополняет его общей навигацией и правил�
 | `frontend/src/App.vue` | оболочка: навигация + область страницы | FE-01 |
 | `frontend/src/components/AppNavigation.vue` | общая навигация, мобильное меню | FE-01 |
 | `frontend/src/router/index.ts` | маршруты `/login`, `/ads`, `/forum`, `/profile` | FE-01 |
-| `frontend/src/views/PlaceholderView.vue` | демо-страницы объявлений, форума и профиля с вымышленными данными | FE-02…FE-04 заменяют своими страницами |
+| `frontend/src/views/LiveView.vue` | объявления, форум и профиль из настоящего API | FE-02…FE-04 заменяют своими страницами |
 | `frontend/src/api/http.ts` | единственная точка запросов к API, разбор ошибок | FE-01 + API-01 |
 | `frontend/src/api/types.ts` | типы запросов и ответов по `openapi.yaml` | FE-01 + API-01 |
 | `frontend/src/styles/main.css` | переменные, общие стили, адаптивность | FE-01 + UI-01 |

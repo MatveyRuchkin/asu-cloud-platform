@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import AuthView from '@/views/AuthView.vue'
-import PlaceholderView from '@/views/PlaceholderView.vue'
+import LiveView from '@/views/LiveView.vue'
 
 // Маршруты каркаса. Содержимое страниц — задача FE-02…FE-04, владелец каркаса — FE-01.
 const router = createRouter({
@@ -17,19 +17,19 @@ const router = createRouter({
     {
       path: '/ads',
       name: 'ads',
-      component: PlaceholderView,
+      component: LiveView,
       meta: { title: 'Объявления' },
     },
     {
       path: '/forum',
       name: 'forum',
-      component: PlaceholderView,
+      component: LiveView,
       meta: { title: 'Форум' },
     },
     {
       path: '/profile',
       name: 'profile',
-      component: PlaceholderView,
+      component: LiveView,
       meta: { title: 'Профиль' },
     },
   ],
