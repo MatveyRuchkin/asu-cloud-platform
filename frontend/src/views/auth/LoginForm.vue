@@ -2,6 +2,8 @@
 import { reactive, ref, watch } from 'vue'
 
 import { apiRequest } from '@/api/http'
+import type { Token } from '@/api/types'
+import { saveToken } from '@/stores/session'
 
 import { authErrorMessage } from './errors'
 import type { LoginRequest } from './types'
@@ -60,7 +62,8 @@ async function submit() {
   submitting.value = true
   try {
     // Единственный способ вызова API — общий клиент src/api/http.ts.
-    await apiRequest('/auth/login', { method: 'POST', body: payload })
+    const result = await apiRequest<Token>('/auth/login', { method: 'POST', body: payload })
+    saveToken(result.access_token)
     successMessage.value = 'Вход выполнен.'
     emit('success')
   } catch (error) {

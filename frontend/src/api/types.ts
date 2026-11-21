@@ -70,3 +70,9 @@ export interface ForumTopic {
   title: string
   author_id: string
 }
+
+/** Категория: элемент GET /api/v1/ad-categories. */
+export interface AdCategory {
+  id: string
+  name: string
+}
