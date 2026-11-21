@@ -7,6 +7,34 @@
 ## Что мы разрабатываем
 Профили студентов, доску объявлений, форум. Учебные материалы, переписка и поиск остаются в общем видении продукта, но не обязательно входят в первый выпуск. [Подробнее](docs/requirements.md).
 
+## Авторы разработки
+
+Проект создаётся командой. В историю ветки `dev` вошли коммиты следующих
+13 GitHub-авторов (проверено 21 ноября 2026):
+
+- [Adilya1177](https://github.com/Adilya1177)
+- [Antonova-vika](https://github.com/Antonova-vika)
+- [arinaminko10](https://github.com/arinaminko10)
+- [catround](https://github.com/catround)
+- [Dildarkhan-mamaev](https://github.com/Dildarkhan-mamaev)
+- [DmitriyDileev](https://github.com/DmitriyDileev)
+- [hakuromi](https://github.com/hakuromi)
+- [Kapitan999](https://github.com/Kapitan999)
+- [makaes](https://github.com/makaes)
+- [MatveyRuchkin](https://github.com/MatveyRuchkin)
+- [PejaDuos](https://github.com/PejaDuos)
+- [PurpleSwtr](https://github.com/PurpleSwtr)
+- [Ton1q77](https://github.com/Ton1q77)
+
+Авторство подтверждено исходными коммитами, а не аккаунтом, выполнившим merge.
+Все исходные авторы сохраняются при интеграции изменений.
+[Полная история разработки](https://github.com/MatveyRuchkin/asu-cloud-platform/commits/dev/)
+и [GitHub Contributors](https://github.com/MatveyRuchkin/asu-cloud-platform/graphs/contributors).
+
+Вся команда из 18 участников и роли опубликованы на
+[портале проекта](https://matveyruchkin.github.io/asu-cloud-platform/).
+Участие в команде и наличие уже вошедшего в репозиторий коммита — разные сведения.
+
 ## Новичку
 
 **[Пошаговая инструкция с нуля](docs/START_HERE.md)** — от регистрации до отправки Pull Request.
