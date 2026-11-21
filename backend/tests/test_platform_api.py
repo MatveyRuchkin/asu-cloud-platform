@@ -180,3 +180,26 @@ def test_reference_seed_is_repeatable_and_does_not_create_users_or_ads(platform)
             (Ad, 0),
         ]:
             assert session.scalar(select(func.count()).select_from(model)) == count
+
+
+def test_reference_cli_uses_compose_environment_without_database_url(platform, monkeypatch) -> None:
+    import os
+
+    from sqlalchemy.engine import make_url
+
+    import app.db.session
+    from app.seed_reference_data import main
+
+    _, factory = platform
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.setenv("POSTGRES_USER", "vm_user")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "local-test:@/#%")
+    monkeypatch.setenv("POSTGRES_DB", "vm_db")
+    monkeypatch.setenv("DB_HOST", "10.10.214.122")
+    monkeypatch.setenv("DB_PORT", "55432")
+    monkeypatch.setattr(app.db.session, "SessionLocal", factory)
+    main()
+    url = make_url(os.environ["DATABASE_URL"])
+    assert url.host == "10.10.214.122" and url.port == 55432
+    assert url.database == "vm_db" and url.username == "vm_user"
+    assert url.password == "local-test:@/#%"
