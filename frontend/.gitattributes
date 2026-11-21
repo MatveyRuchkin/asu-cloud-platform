@@ -1,0 +1,2 @@
+# Keep the repository's Prettier LF setting on Windows checkouts.
+* text=auto eol=lf

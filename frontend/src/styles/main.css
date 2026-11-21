@@ -32,21 +32,8 @@ body {
   padding: var(--space);
 }
 
-.app__nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space);
-  padding: var(--space) 0;
-}
-
-.app__link {
-  color: var(--color-muted);
-  text-decoration: none;
-}
-
-.app__link.router-link-active {
-  color: var(--color-accent);
-  font-weight: 600;
+.app__content {
+  margin-top: var(--space);
 }
 
 .page {
